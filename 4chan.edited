@@ -1,0 +1,33 @@
+#!/bin/bash
+if [ -z $1 ]
+then
+	echo
+	echo "Usage [link]"
+	echo
+else
+	echo $1
+
+
+# -i reads from this file links
+# -nc --no-clobber - skips duplicates or files that would be re-downloaded to existing file
+wget -c $1 -O 4chan.tmp
+
+# Exaples
+# http://boards.4chan.org/wg/res/3198197
+# http://images.4chan.org/wg/src/1276254370544.jpg
+src=`echo $1 | sed -e "s/boards./images./"`
+src=`echo $src | sed -e "s/res/src/"` 
+src=`echo $src | cut -f 1-5 --delimiter='/'`
+src=$src'/'
+	echo
+	echo $src
+	echo
+	
+tab=`cat 4chan.tmp | grep $src`
+for i in $tab
+do
+	echo $i | grep $src | sed -e "s/href=\"//" | sed -e "s/\"//" >> file
+done
+wget -i file -nc 
+rm -rf file
+fi
